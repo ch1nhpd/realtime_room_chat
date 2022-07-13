@@ -20,15 +20,19 @@ def handle(client):
         try:
             # Broadcasting Messages
             message = client.recv(1024)
+            if message.decode('utf-8').split(': ')[1]=='exit!':
+                a=1/0
             broadcast(message,client)
         except:
             # Removing And Closing Clients
-            print('{} left!'.format(nickname).encode('utf-8'))
+            # print('ERROR!!!')
             index = clients.index(client)
-            clients.remove(client)
             client.close()
+            clients.remove(client)
+            
             nickname = nicknames[index]
             broadcast('{} left!'.format(nickname).encode('utf-8'))
+            print(nickname,' left!')
             nicknames.remove(nickname)
             break
 
@@ -40,7 +44,7 @@ def receive():
         print("Connected with {}".format(str(address)))
 
         # Request And Store Nickname
-        client.send('NICK?'.encode('utf-8'))
+        client.send('WHAT IS YOUR NICK?'.encode('utf-8'))
         nickname = client.recv(1024).decode('utf-8')
 
         nicknames.append(nickname)

@@ -7,7 +7,13 @@ host = '127.0.0.1'
 port = 55555
 clients = []
 nicknames = []
+accounts = ['user1','user2','user3','user4']
 
+
+def login(username):
+    if username in accounts and username not in nicknames:
+        return True
+    return False
 
 def broadcast(message,clientSend=None):
     pad = '                         '
@@ -44,15 +50,19 @@ def receive():
         client.send(aes.encrypt('WHAT IS YOUR NAME?').encode('utf-8'))
         nickname = aes.decrypt(client.recv(1024).decode('utf-8'))
 
-        nicknames.append(nickname)
-        clients.append(client)
+        if login(nickname):
+            nicknames.append(nickname)
+            clients.append(client)
 
-        print("Nickname is {}\n".format(nickname))
-        broadcast("{} joined!".format(nickname))
-        client.send(aes.encrypt('Connected to server!').encode('utf-8'))
+            print("Nickname is {}\n".format(nickname))
+            broadcast("{} joined!".format(nickname))
+            client.send(aes.encrypt('Connected to server!').encode('utf-8'))
 
-        thread = threading.Thread(target=handle, args=(client,))
-        thread.start()
+            thread = threading.Thread(target=handle, args=(client,))
+            thread.start()
+        else:
+            client.close()
+            
 
 aes = AESCipher()
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
